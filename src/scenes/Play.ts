@@ -1,32 +1,58 @@
-import Phaser from "phaser";
+import Phaser, { GameObjects, Tilemaps } from "phaser";
+import Pacman from "../entities/Pacman";
+
 
 class Play extends Phaser.Scene {
+    private player!: Pacman;
+    private map!: Tilemaps.Tilemap;
+    private tileset!: Tilemaps.Tileset;
+    private tilesetBG!: Tilemaps.Tileset;
+    private colliderTileset!: Tilemaps.Tileset;
+    private wallsLayer!: Tilemaps.TilemapLayer;
+    private wallsCollider!: Tilemaps.TilemapLayer;
+    private backgroundLayer!: Tilemaps.TilemapLayer;
+
     constructor(){
         super('PlayScene');
     }
 
-    preload() {
-        this.load.image('tiles-bg', 'assets/bg_spikes_tileset.png');
-        this.load.image('tiles-walls', 'assets/wall.png');
-        this.load.image('logo', 'assets/phaser3-logo.png');
-
-
-        this.load.tilemapTiledJSON('map', 'assets/pacmanworldmap.json');
-    }
-
-    create(){
-        const map = this.make.tilemap({key: 'map'});
-        const tileset1 = map.addTilesetImage('background', 'tiles-bg');
-        const tileset2 = map.addTilesetImage('walls', 'tiles-walls');
-
-        map.createLayer(0, tileset1, -300, 0);
-        map.createLayer(1, tileset2, -500, 0);
+    
+    create(): void{
+        this.initMap();
+        this.player = new Pacman(this, 100, 100, 'player');
+        this.player.setScale(0.2, 0.2);
+        this.physics.add.collider(this.player, this.wallsCollider);
         
-
-
+        
     }
 
-   
+    private initMap(): void {
+        this.map = this.make.tilemap({key: 'map'});
+        this.tilesetBG = this.map.addTilesetImage('Background', 'tiles-bg');
+        this.tileset = this.map.addTilesetImage('walls', 'tiles-walls');
+        this.colliderTileset = this.map.addTilesetImage('main_lev_build_1', 'main_lev_build_1');
+        this.wallsCollider = this.map.createLayer('Walls_Colliders', this.colliderTileset, -500, 0).setDepth(-1);
+        this.backgroundLayer = this.map.createLayer('Background', this.tilesetBG, -500, 0).setDepth(0);
+        this.wallsLayer = this.map.createLayer('walls', this.tileset, -500, 0); 
+        this.wallsCollider.setCollisionByProperty({collides: true});
+        this.showDebugWalls();
+    }
+
+    
+
+    update(time: number, delta: number): void {
+        this.player.update();
+    }
+
+    private showDebugWalls(): void {
+        const debugGraphics = this.add.graphics().setAlpha(0.7);
+        this.wallsLayer.renderDebug(debugGraphics, {
+          tileColor: null,
+          collidingTileColor: new Phaser.Display.Color(243, 234, 48, 255),
+        });
+      }
+
+
 }
 
 export default Play;

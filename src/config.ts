@@ -1,13 +1,21 @@
 import Phaser from 'phaser';
+import Play from './scenes/Play';
+import Preload from './scenes/Preload';
 
-export default {
+export const GameConfig: Phaser.Types.Core.GameConfig = {
+  width: 775,
+  height: 700,
   type: Phaser.AUTO,
   parent: 'game',
-  backgroundColor: '#33A5E7',
-  scale: {
-    width: 800,
-    height: 600,
-    mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH
+  scene: [Preload, Play],
+  input: {
+    keyboard: true
+  },
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 0 },
+      debug: true
+    }
   }
 };

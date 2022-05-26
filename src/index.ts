@@ -1,10 +1,12 @@
 import Phaser from 'phaser';
-import config from './config';
-import Play from './scenes/Play';
-import Preload from './scenes/Preload';
+import { GameConfig } from './config';
 
-new Phaser.Game(
-  Object.assign(config, {
-    scene: [Play]
-  })
-);
+export class Game extends Phaser.Game {
+  constructor(config: Phaser.Types.Core.GameConfig) {
+    super(config);
+  }
+}
+
+window.addEventListener('load', () => {
+  const game = new Game(GameConfig);
+})
