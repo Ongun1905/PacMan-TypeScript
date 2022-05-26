@@ -14,7 +14,7 @@ class Pacman extends Phaser.Physics.Arcade.Sprite {
         super(scene, x, y, texture);
         scene.add.existing(this);
         scene.physics.add.existing(this);
-        this.getBody().setCollideWorldBounds(true);
+        //this.getBody().setCollideWorldBounds(true);
 
         this.keyW = this.scene.input.keyboard.addKey('W');
         this.keyA = this.scene.input.keyboard.addKey('A');
@@ -34,6 +34,11 @@ class Pacman extends Phaser.Physics.Arcade.Sprite {
             frameRate: 10,
             repeat: -1
         })
+    }
+
+    protected preUpdate(time: number, delta: number): void {
+        super.preUpdate(time, delta);
+        this.scene.physics.world.wrapObject(this, 32);
     }
 
     update(...args: any[]): void {
