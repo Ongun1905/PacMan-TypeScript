@@ -4,7 +4,7 @@ import Preload from './scenes/Preload';
 
 export const GameConfig: Phaser.Types.Core.GameConfig = {
   width: 775,
-  height: 700,
+  height: 650,
   type: Phaser.AUTO,
   parent: 'game',
   scene: [Preload, Play],
@@ -17,5 +17,9 @@ export const GameConfig: Phaser.Types.Core.GameConfig = {
       gravity: { y: 0 },
       debug: true
     }
+  },
+  scale: {
+    mode: Phaser.Scale.ScaleModes.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
   }
 };

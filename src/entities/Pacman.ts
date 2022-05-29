@@ -1,30 +1,36 @@
-import Phaser, { Game, GameObjects, Physics, Scene } from "phaser";
+import Phaser, { Game, GameObjects, Physics, Scene, Tilemaps } from "phaser";
 import { animMixins } from "../mixins/animMixins";
 
+enum Moves {
+    None,
+    Left,
+    Right,
+    Up,
+    Down
+}
 
 
 class Pacman extends Phaser.Physics.Arcade.Sprite {
-    private keyW: Phaser.Input.Keyboard.Key;
-    private keyA: Phaser.Input.Keyboard.Key;
-    private keyS: Phaser.Input.Keyboard.Key;
-    private keyD: Phaser.Input.Keyboard.Key;
-    private playerSpeed: number;
+    private queuedMove = Moves.None;
+    private lastKeyDown = Moves.None;
+    private queuedMoveAccumulator = 0;
+    private playerSpeed = 100;
 
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame?: string | number) {
         super(scene, x, y, texture);
         scene.add.existing(this);
         scene.physics.add.existing(this);
-        //this.getBody().setCollideWorldBounds(true);
+        
 
-        this.keyW = this.scene.input.keyboard.addKey('W');
-        this.keyA = this.scene.input.keyboard.addKey('A');
-        this.keyS = this.scene.input.keyboard.addKey('S');
-        this.keyD = this.scene.input.keyboard.addKey('D');
+        
         this.playerSpeed = 100;
 
-        this.getBody().setSize(240, 250);
-        this.getBody().setOffset(0, 0);
+        
+        this.getBody().setOffset(5, 0);
+        this.setScale(0.2, 0.2);
         this.initAnimations();
+        this.getBody().setCircle(100, 0, 0)
+        .setFriction(0, 0);
     }
 
     private initAnimations(): void {
@@ -38,33 +44,127 @@ class Pacman extends Phaser.Physics.Arcade.Sprite {
 
     protected preUpdate(time: number, delta: number): void {
         super.preUpdate(time, delta);
-        this.scene.physics.world.wrapObject(this, 32);
+        this.scene.physics.world.wrapObject(this, 100);
     }
 
     update(...args: any[]): void {
-        //this.getBody().setVelocity(10);
         !this.anims.isPlaying && this.anims.play('move');
-        if (this.keyW?.isDown) {
-            this.body.velocity.y = -this.playerSpeed;            
+        
+    }
+
+    handleMovement(dt: number, cursors: Phaser.Types.Input.Keyboard.CursorKeys, wallsLayer: Tilemaps.TilemapLayer) {
+        const vel = this.getBody().velocity;
+        if(vel.lengthSq() > 0.2) {
+            //
+        } else {
+            this.lastKeyDown = Moves.None;
         }
-        if (this.keyA?.isDown) {
-            this.body.velocity.x = -this.playerSpeed;
-            this.setFlipX(true);
-           
+
+        const keysDown = this.getKeysDownState(cursors);
+
+        if(keysDown.left && vel.x >= 0) {
+            if(!wallsLayer.getTileAtWorldXY(this.x - 88, this.y)) {  
+            this.queuedMove = Moves.Left;
+            console.log("left");
+            }
         }
-        if (this.keyS?.isDown) {
-            this.body.velocity.y = this.playerSpeed;
+        else if (keysDown.right && vel.x >= 0) {
+            if(!wallsLayer.getTileAtWorldXY(this.x + 88, this.y)) { 
+            this.queuedMove = Moves.Right;      
+            }
+        }
+        else if(keysDown.up && vel.y >= 0) {
+            if(!wallsLayer.getTileAtWorldXY(this.x, this.y + 88)) {  
+             this.queuedMove = Moves.Up; 
+            }
+        }
+        else if(keysDown.down && vel.y >= 0) {
+            if(!wallsLayer.getTileAtWorldXY(this.x, this.y - 88)) {
+            this.queuedMove = Moves.Down;
+            console.log("down");
+                
+            }
+        }
+
+        if(this.queuedMove !== Moves.None) {
+            this.queuedMoveAccumulator += dt;
+            if(this.queuedMoveAccumulator >= 200) {
+                this.queuedMove = Moves.None;
+                this.queuedMoveAccumulator = 0;
+            }
+        }
+
+        switch(this.queuedMove) {
+            case Moves.None:
+                break;
+
+            case Moves.Left: {
+                this.lastKeyDown = this.queuedMove;
+                this.queuedMove = Moves.None;
+                break;
+            }  
             
+            case Moves.Right: {
+                this.lastKeyDown = this.queuedMove;
+                this.queuedMove = Moves.None;
+                break;
+            }
+
+            case Moves.Up: {
+                this.lastKeyDown = this.queuedMove;
+                this.queuedMove = Moves.None;
+                break;
+            }
+
+            case Moves.Down: {
+                this.lastKeyDown = this.queuedMove;
+                this.queuedMove = Moves.None;
+                break;
+            }
         }
-        if (this.keyD?.isDown) {
-            this.body.velocity.x = this.playerSpeed;
-            this.setFlipX(false);
-            
+
+        switch(this.lastKeyDown) {
+            case Moves.Left: {
+                this.setVelocity(-this.playerSpeed, 0)
+                this.setAngle(180)
+                break;
+            }
+
+            case Moves.Right: {
+                this.setVelocity(this.playerSpeed, 0)
+                this.setAngle(0)
+                break;
+            }
+
+            case Moves.Up: {
+                this.setVelocity(0, -this.playerSpeed)
+                this.setAngle(-90)
+                break;
+            }
+
+            case Moves.Down: {
+                this.setVelocity(0, this.playerSpeed)
+                this.setAngle(90)
+                break;
+            }
+
+            default:
+                break;
+        }
+
+    }
+
+    private getKeysDownState(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
+        return {
+            left: cursors.left?.isDown,
+            right: cursors.right?.isDown,
+            up: cursors.up?.isDown,
+            down: cursors.down?.isDown
         }
     }
 
     protected getBody(): Physics.Arcade.Body {
-        return this.body as Physics.Arcade.Body;
+        return this.body as Phaser.Physics.Arcade.Body;
     }
 }
 export default Pacman;

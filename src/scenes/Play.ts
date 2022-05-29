@@ -11,16 +11,21 @@ class Play extends Phaser.Scene {
     private wallsLayer!: Tilemaps.TilemapLayer;
     private wallsCollider!: Tilemaps.TilemapLayer;
     private backgroundLayer!: Tilemaps.TilemapLayer;
+    private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
 
     constructor(){
         super('PlayScene');
     }
 
+    init(): void {
+        this.cursors = this.input.keyboard.createCursorKeys();
+    }
+
     
     create(): void{
         this.initMap();
-        this.player = new Pacman(this, 100, 100, 'player');
-        this.player.setScale(0.2, 0.2);
+        this.player = new Pacman(this, 40, 50, 'player');
+        this.physics.world.enable(this.player, Phaser.Physics.Arcade.DYNAMIC_BODY);
         this.physics.add.collider(this.player, this.wallsCollider);
         
         
@@ -35,24 +40,18 @@ class Play extends Phaser.Scene {
         this.backgroundLayer = this.map.createLayer('Background', this.tilesetBG, -500, 0).setDepth(0);
         this.wallsLayer = this.map.createLayer('walls', this.tileset, -500, 0); 
         this.wallsCollider.setCollisionByProperty({collides: true});
-        this.showDebugWalls();
+        
     }
 
     
 
     update(time: number, delta: number): void {
-        this.player.update();
+        
+        if(this.player && this.wallsCollider) {
+            this.player.update();
+            this.player.handleMovement(delta, this.cursors, this.wallsCollider);
+        }
     }
-
-    private showDebugWalls(): void {
-        const debugGraphics = this.add.graphics().setAlpha(0.7);
-        this.wallsLayer.renderDebug(debugGraphics, {
-          tileColor: null,
-          collidingTileColor: new Phaser.Display.Color(243, 234, 48, 255),
-        });
-      }
-
-
 }
 
 export default Play;
