@@ -1,9 +1,12 @@
 import Phaser, { GameObjects, Tilemaps } from "phaser";
 import Pacman from "../entities/Pacman";
-
+import Blinky from "../entities/Blinky";
+import Inky from "../entities/Inky";
 
 class Play extends Phaser.Scene {
     private player!: Pacman;
+    private blinky!: Blinky;
+    private inky!: Inky;
     private map!: Tilemaps.Tilemap;
     private tileset!: Tilemaps.Tileset;
     private tilesetBG!: Tilemaps.Tileset;
@@ -24,11 +27,38 @@ class Play extends Phaser.Scene {
     
     create(): void{
         this.initMap();
-        this.player = new Pacman(this, 40, 50, 'player');
+        this.createPlayer();
+        this.createEnemies();
+        
+        
+              
+    }
+
+    createPlayer() {
+        this.player = new Pacman(this, 375, 400, 'player');
         this.physics.world.enable(this.player, Phaser.Physics.Arcade.DYNAMIC_BODY);
+        this.addPlayerColliders();
+    }
+
+    createEnemies() {
+        this.blinky = new Blinky(this, 200, 60, 'blinky-right');
+        this.inky = new Inky(this, 240, 60, 'inky-down');
+        this.addEnemyColliders(); 
+    }
+
+    addPlayerColliders() {
         this.physics.add.collider(this.player, this.wallsCollider);
-        
-        
+    }
+
+    addEnemyColliders(): void {
+        this.physics.add.overlap(this.player, this.blinky, () => {
+            this.scene.restart();
+        });
+        this.physics.add.overlap(this.player, this.inky, () => {
+            this.scene.restart();
+        });
+        this.blinky.setWallColliders(this.wallsCollider); 
+        this.inky.setWallColliders(this.wallsCollider);
     }
 
     private initMap(): void {
@@ -45,12 +75,18 @@ class Play extends Phaser.Scene {
 
     
 
+    
+
     update(time: number, delta: number): void {
         
         if(this.player && this.wallsCollider) {
             this.player.update();
             this.player.handleMovement(delta, this.cursors, this.wallsCollider);
         }
+
+        this.blinky.update();
+        this.inky.patrolVertical();
+        
     }
 }
 

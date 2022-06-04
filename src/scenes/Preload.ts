@@ -20,6 +20,12 @@ class Preload extends Phaser.Scene {
             frameWidth: 220, frameHeight: 200
         })
 
+       this.load.image('blinky-right', 'assets/blinky-right.png');
+       this.load.image('inky-up', 'assets/inky-up.png');
+       this.load.image('inky-down', 'assets/inky-down.png');
+
+
+
     }
 
     update(time: number, delta: number): void {

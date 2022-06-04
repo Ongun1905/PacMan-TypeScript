@@ -1,5 +1,5 @@
 import Phaser, { Game, GameObjects, Physics, Scene, Tilemaps } from "phaser";
-import { animMixins } from "../mixins/animMixins";
+import createPlayerAnims from "./anims/playerAnims";
 
 enum Moves {
     None,
@@ -22,41 +22,35 @@ class Pacman extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this);
         
 
-        
+        createPlayerAnims(this.scene.anims);
         this.playerSpeed = 100;
 
         
         this.getBody().setOffset(5, 0);
         this.setScale(0.2, 0.2);
-        this.initAnimations();
         this.getBody().setCircle(100, 0, 0)
         .setFriction(0, 0);
     }
 
-    private initAnimations(): void {
-        this.scene.anims.create({
-            key: 'move',
-            frames: this.anims.generateFrameNumbers('player', {start: 0, end: 2}),
-            frameRate: 10,
-            repeat: -1
-        })
-    }
+    
 
     protected preUpdate(time: number, delta: number): void {
         super.preUpdate(time, delta);
-        this.scene.physics.world.wrapObject(this, 100);
+        this.scene.physics.world.wrapObject(this, 88);
     }
 
     update(...args: any[]): void {
-        !this.anims.isPlaying && this.anims.play('move');
+        //!this.anims.isPlaying && this.anims.play('player-move');
         
     }
 
     handleMovement(dt: number, cursors: Phaser.Types.Input.Keyboard.CursorKeys, wallsLayer: Tilemaps.TilemapLayer) {
         const vel = this.getBody().velocity;
+        console.log(vel);
         if(vel.lengthSq() > 0.2) {
-            //
+            this.play('player-move', true);
         } else {
+            this.play('player-idle');
             this.lastKeyDown = Moves.None;
         }
 
