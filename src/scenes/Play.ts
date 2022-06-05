@@ -2,11 +2,15 @@ import Phaser, { GameObjects, Tilemaps } from "phaser";
 import Pacman from "../entities/Pacman";
 import Blinky from "../entities/Blinky";
 import Inky from "../entities/Inky";
+import Pinky from "../entities/Pinky";
+import Clyde from "../entities/Clyde";
 
 class Play extends Phaser.Scene {
     private player!: Pacman;
     private blinky!: Blinky;
     private inky!: Inky;
+    private pinky!: Pinky;
+    private clyde!: Clyde;
     private map!: Tilemaps.Tilemap;
     private tileset!: Tilemaps.Tileset;
     private tilesetBG!: Tilemaps.Tileset;
@@ -29,9 +33,6 @@ class Play extends Phaser.Scene {
         this.initMap();
         this.createPlayer();
         this.createEnemies();
-        
-        
-              
     }
 
     createPlayer() {
@@ -43,6 +44,8 @@ class Play extends Phaser.Scene {
     createEnemies() {
         this.blinky = new Blinky(this, 200, 60, 'blinky-right');
         this.inky = new Inky(this, 240, 60, 'inky-down');
+        this.pinky = new Pinky(this, 240, 210, 'pinky');
+        this.clyde = new Clyde(this, 490, 240, 'clyde-down');
         this.addEnemyColliders(); 
     }
 
@@ -57,8 +60,16 @@ class Play extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.inky, () => {
             this.scene.restart();
         });
+        this.physics.add.overlap(this.player, this.pinky, () => {
+            this.scene.restart();
+        });
+        this.physics.add.overlap(this.player, this.clyde, () => {
+            this.scene.restart();
+        });
         this.blinky.setWallColliders(this.wallsCollider); 
         this.inky.setWallColliders(this.wallsCollider);
+        this.pinky.setWallColliders(this.wallsCollider);
+        this.clyde.setWallColliders(this.wallsCollider);
     }
 
     private initMap(): void {
@@ -74,18 +85,18 @@ class Play extends Phaser.Scene {
     }
 
     
-
-    
-
     update(time: number, delta: number): void {
         
         if(this.player && this.wallsCollider) {
-            this.player.update();
-            this.player.handleMovement(delta, this.cursors, this.wallsCollider);
+            this.player.handleMovement(this.cursors, this.wallsCollider);
         }
 
-        this.blinky.update();
-        this.inky.patrolVertical();
+        this.blinky.patrolHorizontal();
+        this.inky.patrolVertical('inky-up', 'inky-down');
+        this.pinky.patrolHorizontal();
+        this.clyde.patrolVertical('clyde-up', 'clyde-down');
+
+        
         
     }
 }

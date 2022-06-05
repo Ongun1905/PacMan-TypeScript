@@ -23,8 +23,11 @@ class Preload extends Phaser.Scene {
        this.load.image('blinky-right', 'assets/blinky-right.png');
        this.load.image('inky-up', 'assets/inky-up.png');
        this.load.image('inky-down', 'assets/inky-down.png');
+       this.load.image('pinky', 'assets/pinky.png');
+       this.load.image('clyde-up', 'assets/clyde-up.png');
+       this.load.image('clyde-down', 'assets/clyde-down.png');
 
-
+       
 
     }
 

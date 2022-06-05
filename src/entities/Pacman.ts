@@ -15,6 +15,7 @@ class Pacman extends Phaser.Physics.Arcade.Sprite {
     private lastKeyDown = Moves.None;
     private queuedMoveAccumulator = 0;
     private playerSpeed = 100;
+    private munchSound !: Phaser.Sound.BaseSound;
 
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame?: string | number) {
         super(scene, x, y, texture);
@@ -28,8 +29,12 @@ class Pacman extends Phaser.Physics.Arcade.Sprite {
         
         this.getBody().setOffset(5, 0);
         this.setScale(0.2, 0.2);
-        this.getBody().setCircle(100, 0, 0)
+        this.getBody()
+        .setCircle(100, 0, 0)
         .setFriction(0, 0);
+
+        
+
     }
 
     
@@ -39,16 +44,13 @@ class Pacman extends Phaser.Physics.Arcade.Sprite {
         this.scene.physics.world.wrapObject(this, 88);
     }
 
-    update(...args: any[]): void {
-        //!this.anims.isPlaying && this.anims.play('player-move');
-        
-    }
 
-    handleMovement(dt: number, cursors: Phaser.Types.Input.Keyboard.CursorKeys, wallsLayer: Tilemaps.TilemapLayer) {
+    handleMovement(cursors: Phaser.Types.Input.Keyboard.CursorKeys, wallsLayer: Tilemaps.TilemapLayer) {
         const vel = this.getBody().velocity;
-        console.log(vel);
+        
         if(vel.lengthSq() > 0.2) {
             this.play('player-move', true);
+            
         } else {
             this.play('player-idle');
             this.lastKeyDown = Moves.None;
@@ -59,7 +61,6 @@ class Pacman extends Phaser.Physics.Arcade.Sprite {
         if(keysDown.left && vel.x >= 0) {
             if(!wallsLayer.getTileAtWorldXY(this.x - 88, this.y)) {  
             this.queuedMove = Moves.Left;
-            console.log("left");
             }
         }
         else if (keysDown.right && vel.x >= 0) {
@@ -74,20 +75,11 @@ class Pacman extends Phaser.Physics.Arcade.Sprite {
         }
         else if(keysDown.down && vel.y >= 0) {
             if(!wallsLayer.getTileAtWorldXY(this.x, this.y - 88)) {
-            this.queuedMove = Moves.Down;
-            console.log("down");
-                
+            this.queuedMove = Moves.Down; 
             }
         }
 
-        if(this.queuedMove !== Moves.None) {
-            this.queuedMoveAccumulator += dt;
-            if(this.queuedMoveAccumulator >= 200) {
-                this.queuedMove = Moves.None;
-                this.queuedMoveAccumulator = 0;
-            }
-        }
-
+        
         switch(this.queuedMove) {
             case Moves.None:
                 break;
@@ -156,6 +148,8 @@ class Pacman extends Phaser.Physics.Arcade.Sprite {
             down: cursors.down?.isDown
         }
     }
+
+
 
     protected getBody(): Physics.Arcade.Body {
         return this.body as Phaser.Physics.Arcade.Body;

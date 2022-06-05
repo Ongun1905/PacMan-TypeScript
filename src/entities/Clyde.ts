@@ -1,13 +1,14 @@
 import Enemy from "./Enemy";
 
 
-class Blinky extends Enemy {
+class Clyde extends Enemy {
+    
     constructor(scene: Phaser.Scene, x: number, y: number, key: string) {
         super(scene, x, y, key);
-        this.setVelocityX(this.initialVelocity);
+        this.setVelocityY(this.initialVelocity);
     }
 
-    
+   
 }
 
-export default Blinky;
+export default Clyde;

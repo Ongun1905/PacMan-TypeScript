@@ -30,7 +30,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     
 
-    patrol(): void {
+    patrolHorizontal(): void {
         this.checkIfCollided();
         
         if(this.hasCollided && this.lastHorizontalDirection == Phaser.Physics.Arcade.FACING_RIGHT) {
@@ -48,6 +48,21 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         
     }
 
+    patrolVertical(key1: string, key2: string) {
+        this.checkIfCollided();
+        if(this.hasCollided && this.lastVerticalDirection == Phaser.Physics.Arcade.FACING_DOWN) {
+            this.setTexture(key1);
+            this.setVelocityY(-this.initialVelocity);
+            this.lastVerticalDirection = Phaser.Physics.Arcade.FACING_UP;
+        } 
+        else if(this.hasCollided && this.lastVerticalDirection == Phaser.Physics.Arcade.FACING_UP) {
+            this.setTexture(key2);
+            this.setVelocityY(this.initialVelocity);
+            this.lastVerticalDirection = Phaser.Physics.Arcade.FACING_DOWN;
+        } 
+        this.hasCollided = false;
+    }
+
     checkIfCollided(){
         this.scene.physics.collide(this, this.wallCollidersLayer, () => {
             this.hasCollided = true;
@@ -57,10 +72,6 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     setWallColliders(wallCollidersLayer: Tilemaps.TilemapLayer) {
         this.wallCollidersLayer = wallCollidersLayer;
     }
-
-    
-
-    
 }
 
 export default Enemy;

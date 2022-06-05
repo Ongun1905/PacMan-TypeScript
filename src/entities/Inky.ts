@@ -9,20 +9,6 @@ class Inky extends Enemy {
     }
 
    
-    patrolVertical() {
-        this.checkIfCollided();
-        if(this.hasCollided && this.lastVerticalDirection == Phaser.Physics.Arcade.FACING_DOWN) {
-            this.setTexture('inky-up');
-            this.setVelocityY(-this.initialVelocity);
-            this.lastVerticalDirection = Phaser.Physics.Arcade.FACING_UP;
-        } 
-        else if(this.hasCollided && this.lastVerticalDirection == Phaser.Physics.Arcade.FACING_UP) {
-            this.setTexture('inky-down')
-            this.setVelocityY(this.initialVelocity);
-            this.lastVerticalDirection = Phaser.Physics.Arcade.FACING_DOWN;
-        } 
-        this.hasCollided = false;
-    }
 }
 
 export default Inky;
