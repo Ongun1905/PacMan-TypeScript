@@ -12,6 +12,7 @@ class Preload extends Phaser.Scene {
         this.load.image('tiles-bg', 'assets/bg_spikes_tileset.png');
         this.load.image('tiles-walls', 'assets/wall.png');
         this.load.image('main_lev_build_1', 'assets/main_lev_build_1.png');
+        this.load.image('bonus', 'assets/bonus.png');
 
 
         

@@ -11,6 +11,8 @@ class Play extends Phaser.Scene {
     private inky!: Inky;
     private pinky!: Pinky;
     private clyde!: Clyde;
+    private coin!: Phaser.GameObjects.Image;
+    private bonusDestroyed!: boolean;
     private map!: Tilemaps.Tilemap;
     private tileset!: Tilemaps.Tileset;
     private tilesetBG!: Tilemaps.Tileset;
@@ -26,6 +28,7 @@ class Play extends Phaser.Scene {
 
     init(): void {
         this.cursors = this.input.keyboard.createCursorKeys();
+        this.bonusDestroyed = false;
     }
 
     
@@ -33,10 +36,12 @@ class Play extends Phaser.Scene {
         this.initMap();
         this.createPlayer();
         this.createEnemies();
+        this.spawnBonus();
+        
     }
 
     createPlayer() {
-        this.player = new Pacman(this, 375, 400, 'player');
+        this.player = new Pacman(this, 375, 425, 'player');
         this.physics.world.enable(this.player, Phaser.Physics.Arcade.DYNAMIC_BODY);
         this.addPlayerColliders();
     }
@@ -72,7 +77,7 @@ class Play extends Phaser.Scene {
         this.clyde.setWallColliders(this.wallsCollider);
     }
 
-    private initMap(): void {
+    initMap(): void {
         this.map = this.make.tilemap({key: 'map'});
         this.tilesetBG = this.map.addTilesetImage('Background', 'tiles-bg');
         this.tileset = this.map.addTilesetImage('walls', 'tiles-walls');
@@ -82,6 +87,24 @@ class Play extends Phaser.Scene {
         this.wallsLayer = this.map.createLayer('walls', this.tileset, -500, 0); 
         this.wallsCollider.setCollisionByProperty({collides: true});
         
+    }
+
+    spawnBonus(): void {
+        this.time.addEvent({
+            delay: 5000,
+            callback: () => {
+                this.coin = this.add.sprite(375, 375, 'bonus').setScale(0.01, 0.01);
+                this.physics.add.existing(this.coin);
+            }
+        })
+        
+    }
+
+    collectBonus(): void {
+        this.physics.add.overlap(this.player, this.coin, (player,coin) => {
+            coin.destroy();
+            this.spawnBonus();
+        })
     }
 
     
@@ -95,7 +118,7 @@ class Play extends Phaser.Scene {
         this.inky.patrolVertical('inky-up', 'inky-down');
         this.pinky.patrolHorizontal();
         this.clyde.patrolVertical('clyde-up', 'clyde-down');
-
+        this.collectBonus();
         
         
     }

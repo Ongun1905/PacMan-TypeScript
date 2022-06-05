@@ -1,4 +1,4 @@
-import Phaser, { Game, GameObjects, Physics, Scene, Tilemaps } from "phaser";
+import Phaser, {Physics, Tilemaps } from "phaser";
 import createPlayerAnims from "./anims/playerAnims";
 
 enum Moves {
@@ -13,9 +13,8 @@ enum Moves {
 class Pacman extends Phaser.Physics.Arcade.Sprite {
     private queuedMove = Moves.None;
     private lastKeyDown = Moves.None;
-    private queuedMoveAccumulator = 0;
     private playerSpeed = 100;
-    private munchSound !: Phaser.Sound.BaseSound;
+    
 
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame?: string | number) {
         super(scene, x, y, texture);
