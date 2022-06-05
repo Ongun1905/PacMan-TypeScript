@@ -28,7 +28,8 @@ class Preload extends Phaser.Scene {
        this.load.image('clyde-up', 'assets/clyde-up.png');
        this.load.image('clyde-down', 'assets/clyde-down.png');
 
-       
+       this.load.audio('eat-fruit', 'assets/pacman_eatfruit.wav');
+       this.load.audio('munch', 'assets/pacman_chomp.wav');
 
     }
 

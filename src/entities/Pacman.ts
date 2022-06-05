@@ -14,6 +14,7 @@ class Pacman extends Phaser.Physics.Arcade.Sprite {
     private queuedMove = Moves.None;
     private lastKeyDown = Moves.None;
     private playerSpeed = 100;
+    private moveSound!: Phaser.Sound.BaseSound;
     
 
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame?: string | number) {
@@ -32,11 +33,24 @@ class Pacman extends Phaser.Physics.Arcade.Sprite {
         .setCircle(100, 0, 0)
         .setFriction(0, 0);
 
-        
-
+        this.init();
     }
 
-    
+    init():void {
+        this.moveSound = this.scene.sound.add('munch', {volume: 0.2});
+
+        this.scene.time.addEvent({
+            delay: 350,
+            repeat: -1,
+            callbackScope: this,
+            callback: () => {
+                if(this.anims.isPlaying && this.anims.getName() == 'player-move') {
+                    this.moveSound.play();
+                }
+            }
+        })
+    }
+
 
     protected preUpdate(time: number, delta: number): void {
         super.preUpdate(time, delta);
@@ -46,7 +60,7 @@ class Pacman extends Phaser.Physics.Arcade.Sprite {
 
     handleMovement(cursors: Phaser.Types.Input.Keyboard.CursorKeys, wallsLayer: Tilemaps.TilemapLayer) {
         const vel = this.getBody().velocity;
-        
+
         if(vel.lengthSq() > 0.2) {
             this.play('player-move', true);
             
@@ -54,6 +68,7 @@ class Pacman extends Phaser.Physics.Arcade.Sprite {
             this.play('player-idle');
             this.lastKeyDown = Moves.None;
         }
+
 
         const keysDown = this.getKeysDownState(cursors);
 

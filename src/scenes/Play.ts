@@ -12,7 +12,7 @@ class Play extends Phaser.Scene {
     private pinky!: Pinky;
     private clyde!: Clyde;
     private coin!: Phaser.GameObjects.Image;
-    private bonusDestroyed!: boolean;
+    private pickUp!: Phaser.Sound.BaseSound;
     private map!: Tilemaps.Tilemap;
     private tileset!: Tilemaps.Tileset;
     private tilesetBG!: Tilemaps.Tileset;
@@ -28,11 +28,12 @@ class Play extends Phaser.Scene {
 
     init(): void {
         this.cursors = this.input.keyboard.createCursorKeys();
-        this.bonusDestroyed = false;
+        this.pickUp = this.sound.add('eat-fruit', {volume: 0.2});
     }
 
     
     create(): void{
+        
         this.initMap();
         this.createPlayer();
         this.createEnemies();
@@ -102,6 +103,7 @@ class Play extends Phaser.Scene {
 
     collectBonus(): void {
         this.physics.add.overlap(this.player, this.coin, (player,coin) => {
+            this.pickUp.play();
             coin.destroy();
             this.spawnBonus();
         })
